@@ -231,8 +231,8 @@ def main(args):
 
         frms_ax = plt.subplot2grid((4, 4), (0, 0), colspan=2, rowspan=4)
         flux_ax = plt.subplot2grid((4, 4), (0, 2), colspan=2)
-        ccdx_ax = plt.subplot2grid((4, 4), (1, 2), colspan=2)
-        ccdy_ax = plt.subplot2grid((4, 4), (2, 2), colspan=2)
+        ccdx_ax = plt.subplot2grid((4, 4), (1, 2), colspan=2, sharex=flux_ax)
+        ccdy_ax = plt.subplot2grid((4, 4), (2, 2), colspan=2, sharex=flux_ax)
         bprev_ax = plt.subplot2grid((4, 4), (3, 2))
         bnext_ax = plt.subplot2grid((4, 4), (3, 3))
 
