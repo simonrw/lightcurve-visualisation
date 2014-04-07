@@ -56,6 +56,12 @@ class LightcurveDisplay(object):
         for axis_name in self.data_axes:
             self.a[axis_name].clear()
 
+    def remove_frms_line(self):
+        self.frms_data.remove()
+        logger.debug('FRMS line: {}'.format(self.frms_data))
+        del self.frms_data
+
+
     def display_lightcurves(self, mags, frms, indices):
         self.mags = mags
         self.frms = frms
@@ -171,6 +177,7 @@ class RectChooser(object):
     def reset_buttons(self):
         self.buttons[0].disconnect(self.prev_cid)
         self.buttons[1].disconnect(self.next_cid)
+        self.l.remove_frms_line()
         del self.l
 
     def load_lightcurves(self, indices):
