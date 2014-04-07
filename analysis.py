@@ -135,7 +135,7 @@ class RectChooser(object):
         self.frms = frms
         self.all_axes = all_axes
         self.buttons = buttons
-        self.RS = RectangleSelector(self.ax, self.on_event, drawtype='box')
+        self.selector = RectangleSelector(self.ax, self.on_event, drawtype='box')
         self.l = None
 
     def on_event(self, eclick, erelease):
@@ -170,13 +170,13 @@ class RectChooser(object):
 
     def toggle_selector(self, event):
         logger.debug(' Key pressed.')
-        if event.key in self.MOUSEUP and self.RS.active:
+        if event.key in self.MOUSEUP and self.selector.active:
             logger.debug('RectangleSelector deactivated')
-            self.RS.set_active(False)
+            self.selector.set_active(False)
 
-        if event.key in self.MOUSEDOWN and not self.RS.active:
+        if event.key in self.MOUSEDOWN and not self.selector.active:
             logger.debug('RectangleSelector activated')
-            self.RS.set_active(True)
+            self.selector.set_active(True)
 
 
 def main(args):
