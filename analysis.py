@@ -52,6 +52,11 @@ class LightcurveDisplay(object):
 
         self.clear_axes()
 
+    @property
+    def object_id(self):
+        catalogue = self.infile['catalogue']
+        return catalogue['obj_id'].read()[self.index]
+
     def clear_axes(self):
         for axis_name in self.data_axes:
             self.a[axis_name].clear()
@@ -90,6 +95,13 @@ class LightcurveDisplay(object):
         self.ccdy_data = self.update_plot(self.a['ccdy'], frames, ccdy, 'g.')
 
         self.update_frms_plot()
+
+        self.set_title()
+
+    def set_title(self):
+        obj_id = self.object_id
+        logger.debug('Object: {}'.format(obj_id))
+        self.a['flux'].set_title(obj_id)
 
     def update_frms_plot(self):
         logger.debug('Updating frms plot')
