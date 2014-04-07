@@ -163,10 +163,22 @@ class RectChooser(object):
         if not chosen.any():
             logger.error("No lightcurves chosen, please try again")
         else:
-            self.l = LightcurveDisplay(self.fitsfile, self.all_axes).display_lightcurves(self.mags, self.frms, indices[chosen])
+            if self.l is None:
+                logger.debug('Lightcurve display not present, creating new one')
+                self.l = LightcurveDisplay(self.fitsfile, self.all_axes).display_lightcurves(self.mags, self.frms, indices[chosen])
 
-            self.prev_cid = self.buttons[0].on_clicked(self.l.previous)
-            self.next_cid = self.buttons[1].on_clicked(self.l.next)
+                self.prev_cid = self.buttons[0].on_clicked(self.l.previous)
+                self.next_cid = self.buttons[1].on_clicked(self.l.next)
+            else:
+                logger.debug('Lightcurve display present')
+                self.buttons[0].disconnect(self.prev_cid)
+                self.buttons[1].disconnect(self.next_cid)
+                del self.l
+
+                self.l = LightcurveDisplay(self.fitsfile, self.all_axes).display_lightcurves(self.mags, self.frms, indices[chosen])
+
+                self.prev_cid = self.buttons[0].on_clicked(self.l.previous)
+                self.next_cid = self.buttons[1].on_clicked(self.l.next)
 
     def toggle_selector(self, event):
         logger.debug(' Key pressed.')
