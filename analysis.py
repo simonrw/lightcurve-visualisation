@@ -8,6 +8,7 @@ Usage:
 Options:
     -h, --help                  Show this help
     -z, --zp <zp>               Zero point to use [default: 21.18]
+    --hjd                       Plot against hjd
 '''
 
 from docopt import docopt
@@ -67,10 +68,11 @@ class LightcurveDisplay(object):
         del self.frms_data
 
 
-    def display_lightcurves(self, mags, frms, indices):
+    def display_lightcurves(self, mags, frms, indices, use_hjd=False):
         self.mags = mags
         self.frms = frms
         self.indices = indices
+        self.use_hjd = use_hjd
 
         logging.debug('Got indices {}'.format(self.indices))
         self.plot_lightcurve()
@@ -85,14 +87,17 @@ class LightcurveDisplay(object):
         flux = extract_lightcurve(self.index, self.infile, hdu='flux')
 
         logging.debug('Data length: {}'.format(flux.size))
-        frames = np.arange(flux.size)
+        if self.use_hjd:
+            xdata = extract_lightcurve(self.index, self.infile, hdu='hjd')
+        else:
+            xdata = np.arange(flux.size)
 
         ccdx = extract_lightcurve(self.index, self.infile, hdu='ccdx')
         ccdy = extract_lightcurve(self.index, self.infile, hdu='ccdy')
 
-        self.flux_data = self.update_plot(self.a['flux'], frames, flux, 'r.')
-        self.ccdx_data = self.update_plot(self.a['ccdx'], frames, ccdx, 'g.')
-        self.ccdy_data = self.update_plot(self.a['ccdy'], frames, ccdy, 'g.')
+        self.flux_data = self.update_plot(self.a['flux'], xdata, flux, 'r.')
+        self.ccdx_data = self.update_plot(self.a['ccdx'], xdata, ccdx, 'g.')
+        self.ccdy_data = self.update_plot(self.a['ccdy'], xdata, ccdy, 'g.')
 
         self.update_frms_plot()
 
@@ -146,13 +151,14 @@ class RectChooser(object):
     MOUSEUP = ['Q', 'q']
     MOUSEDOWN = ['A', 'a']
 
-    def __init__(self, fitsfile, ax, mags, frms, all_axes, buttons):
+    def __init__(self, fitsfile, ax, mags, frms, all_axes, buttons, use_hjd=False):
         self.fitsfile = fitsfile
         self.ax = ax
         self.mags = mags
         self.frms = frms
         self.all_axes = all_axes
         self.buttons = buttons
+        self.use_hjd = use_hjd
         self.selector = RectangleSelector(self.ax, self.on_event, drawtype='box')
         self.l = None
 
@@ -193,7 +199,8 @@ class RectChooser(object):
         del self.l
 
     def load_lightcurves(self, indices):
-        self.l = LightcurveDisplay(self.fitsfile, self.all_axes).display_lightcurves(self.mags, self.frms, indices)
+        self.l = LightcurveDisplay(self.fitsfile, self.all_axes).display_lightcurves(self.mags, 
+                self.frms, indices, use_hjd=self.use_hjd)
 
         self.prev_cid = self.buttons[0].on_clicked(self.l.previous)
         self.next_cid = self.buttons[1].on_clicked(self.l.next)
@@ -242,7 +249,10 @@ def main(args):
         flux_ax.set_ylabel(r'Flux')
         ccdx_ax.set_ylabel(r'X')
         ccdy_ax.set_ylabel(r'Y')
-        ccdy_ax.set_xlabel(r'Frames')
+        if args['--hjd']:
+            ccdy_ax.set_xlabel(r'HJD')
+        else:
+            ccdy_ax.set_xlabel(r'Frames')
 
         # Construct buttons
         bprev = Button(bprev_ax, 'Previous')
@@ -262,7 +272,8 @@ def main(args):
         frms_ax.set_yscale(r'log')
 
 
-        picker = RectChooser(infile, frms_ax, mags, frms, all_axes=axes, buttons=[bprev, bnext])
+        picker = RectChooser(infile, frms_ax, mags, frms, all_axes=axes, buttons=[bprev, bnext],
+                use_hjd=args['--hjd'])
 
         plt.tight_layout()
         plt.show()
