@@ -56,6 +56,12 @@ class LightcurveDisplay(object):
         for axis_name in self.data_axes:
             self.a[axis_name].clear()
 
+    def remove_frms_line(self):
+        self.frms_data.remove()
+        logger.debug('FRMS line: {}'.format(self.frms_data))
+        del self.frms_data
+
+
     def display_lightcurves(self, mags, frms, indices):
         self.mags = mags
         self.frms = frms
@@ -163,22 +169,23 @@ class RectChooser(object):
         if not chosen.any():
             logger.error("No lightcurves chosen, please try again")
         else:
-            if self.l is None:
-                logger.debug('Lightcurve display not present, creating new one')
-                self.l = LightcurveDisplay(self.fitsfile, self.all_axes).display_lightcurves(self.mags, self.frms, indices[chosen])
-
-                self.prev_cid = self.buttons[0].on_clicked(self.l.previous)
-                self.next_cid = self.buttons[1].on_clicked(self.l.next)
-            else:
+            if self.l is not None:
                 logger.debug('Lightcurve display present')
-                self.buttons[0].disconnect(self.prev_cid)
-                self.buttons[1].disconnect(self.next_cid)
-                del self.l
+                self.reset_buttons()
+            self.load_lightcurves(indices[chosen])
 
-                self.l = LightcurveDisplay(self.fitsfile, self.all_axes).display_lightcurves(self.mags, self.frms, indices[chosen])
+    def reset_buttons(self):
+        self.buttons[0].disconnect(self.prev_cid)
+        self.buttons[1].disconnect(self.next_cid)
+        self.l.remove_frms_line()
+        del self.l
 
-                self.prev_cid = self.buttons[0].on_clicked(self.l.previous)
-                self.next_cid = self.buttons[1].on_clicked(self.l.next)
+    def load_lightcurves(self, indices):
+        self.l = LightcurveDisplay(self.fitsfile, self.all_axes).display_lightcurves(self.mags, self.frms, indices)
+
+        self.prev_cid = self.buttons[0].on_clicked(self.l.previous)
+        self.next_cid = self.buttons[1].on_clicked(self.l.next)
+
 
     def toggle_selector(self, event):
         logger.debug(' Key pressed.')
