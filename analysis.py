@@ -8,6 +8,7 @@ Usage:
 Options:
     -h, --help                  Show this help
     -z, --zp <zp>               Zero point to use [default: 21.18]
+    --hjd                       Plot against hjd
 '''
 
 from docopt import docopt
