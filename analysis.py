@@ -151,7 +151,8 @@ class RectChooser(object):
     MOUSEUP = ['Q', 'q']
     MOUSEDOWN = ['A', 'a']
 
-    def __init__(self, fitsfile, ax, mags, frms, all_axes, buttons, use_hjd=False):
+    def __init__(self, fitsfile, ax, mags, frms, all_axes, buttons, use_hjd=False,
+            display_class=LightcurveDisplay):
         self.fitsfile = fitsfile
         self.ax = ax
         self.mags = mags
@@ -159,6 +160,7 @@ class RectChooser(object):
         self.all_axes = all_axes
         self.buttons = buttons
         self.use_hjd = use_hjd
+        self.display_class = display_class
         self.selector = RectangleSelector(self.ax, self.on_event, drawtype='box')
         self.l = None
 
@@ -199,7 +201,7 @@ class RectChooser(object):
         del self.l
 
     def load_lightcurves(self, indices):
-        self.l = LightcurveDisplay(self.fitsfile, self.all_axes).display_lightcurves(self.mags, 
+        self.l = self.display_class(self.fitsfile, self.all_axes).display_lightcurves(self.mags, 
                 self.frms, indices, use_hjd=self.use_hjd)
 
         self.prev_cid = self.buttons[0].on_clicked(self.l.previous)
