@@ -181,8 +181,8 @@ class RectChooser(object):
         logger.info('Using frms range {} to {}'.format(frms_min, frms_max))
 
         indices = np.arange(self.mags.size)
-        chosen = ((self.mags >= mag_min) & 
-                (self.mags < mag_max) & 
+        chosen = ((self.mags >= mag_min) &
+                (self.mags < mag_max) &
                 (self.frms >= frms_min) &
                 (self.frms < frms_max))
 
@@ -201,7 +201,7 @@ class RectChooser(object):
         del self.l
 
     def load_lightcurves(self, indices):
-        self.l = self.display_class(self.fitsfile, self.all_axes).display_lightcurves(self.mags, 
+        self.l = self.display_class(self.fitsfile, self.all_axes).display_lightcurves(self.mags,
                 self.frms, indices, use_hjd=self.use_hjd)
 
         self.prev_cid = self.buttons[0].on_clicked(self.l.previous)
@@ -279,11 +279,6 @@ def main(args):
 
         plt.tight_layout()
         plt.show()
-
-
-
-
-
 
 if __name__ == '__main__':
     main(docopt(__doc__))
